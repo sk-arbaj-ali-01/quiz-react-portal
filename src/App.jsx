@@ -1,4 +1,5 @@
 import Home from "./pages/Home"
+import QuizEditor from "./pages/QuizEditor"
 import QuizManagement from "./pages/QuizManagement"
 
 
@@ -7,7 +8,8 @@ function App() {
   return (
     <>
       {/* <Home /> */}
-      <QuizManagement/>
+      {/* <QuizManagement/> */}
+      <QuizEditor />
     </>
   )
 }
