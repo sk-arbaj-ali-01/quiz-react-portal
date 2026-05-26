@@ -1,6 +1,7 @@
 import Home from "./pages/Home"
 import QuizEditor from "./pages/QuizEditor"
 import QuizManagement from "./pages/QuizManagement"
+import StudentQuizView from "./pages/StudentQuizView"
 
 
 function App() {
@@ -9,7 +10,8 @@ function App() {
     <>
       {/* <Home /> */}
       {/* <QuizManagement/> */}
-      <QuizEditor />
+      {/* <QuizEditor /> */}
+      <StudentQuizView />
     </>
   )
 }
