@@ -1,0 +1,170 @@
+import React, { useEffect, useState } from 'react';
+import ShortAnswerCard from '../components/StudentQuizView/ShortAnswerCard';
+import MCQCard from '../components/StudentQuizView/MCQCard';
+import MSQCard from '../components/StudentQuizView/MSQCard';
+import TrueFalseCard from '../components/StudentQuizView/TrueFalseCard';
+import {StudentQuizProvider} from '../contexts/StudentQuizContext';
+
+export default function StudentQuizView() {
+    const [indexForQuestion, setIndexForQuestion] = useState(0);
+    const [questions, setQuestions] = useState([]);
+    const [progress, setProgress] = useState(0);
+
+    useEffect(()=>{
+        fetch("http://localhost:3000/questions")
+        .then(res => res.json())
+        .then(data => {
+            setQuestions(data);
+            // if (data && data.length > 0) {
+            //     const t = data[0].type;
+            //     if (t === 'MCQ') setComponent(<MCQCard id={data[0].id} index={0} nextComponent={changeComponent}/>)
+            //     else if (t === 'MSQ') setComponent(<MSQCard id={data[0].id} index={0} nextComponent={changeComponent}/>)
+            //     else if (t === 'TF') setComponent(<TrueFalseCard id={data[0].id} index={0} nextComponent={changeComponent}/>)
+            //     else if (t === 'SA') setComponent(<ShortAnswerCard id={data[0].id} index={0} nextComponent={changeComponent}/>)
+            // }
+        })
+        .catch(err => console.error('Failed to load questions', err));
+        // console.log("inside useEffect");
+    }, []);
+
+    useEffect(()=> {
+        calculateProgress();
+    }, [questions]);
+
+    const calculateProgress = () =>{
+        let progressCount = 0;
+        questions.forEach((elem) => elem.answered === true ? progressCount += 1 : null);
+        setProgress(progressCount);
+    }
+
+    const chooseOptionForMCQ = (id, option) => {
+        setQuestions(prev => prev.map(elem => {
+            if (elem.id === id) {
+                return { ...elem, selectedOption: option, answered: true};
+            }
+            return elem;
+        }));
+    }
+
+    const chooseOptionForMSQ = (id, option) => {
+        setQuestions(prev => prev.map(elem => {
+            if (elem.id !== id) return elem;
+            const selected = Array.isArray(elem.selectedOption) ? elem.selectedOption : [];
+            const already = selected.includes(option);
+            const newSelected = already ? selected : [...selected, option];
+            return { ...elem, selectedOption: newSelected, answered: true };
+        }));
+    }
+
+    const chooseOptionForTrueFalse = (id, option) => {
+        setQuestions(prev => prev.map(elem => elem.id === id ? { ...elem, selectedOption: option, answered: true} : elem));
+    }
+
+    const chooseAnswerForShortAnswer = (id, answer) => {
+        setQuestions(prev => prev.map(elem => elem.id === id ? { ...elem, answer, answered: true } : elem));
+    }
+
+    const changeindexForQuestions = (index) => {
+        setIndexForQuestion(index);
+    }
+
+    return (
+        <StudentQuizProvider value={{
+            questions,
+            progress,
+            chooseOptionForMCQ,
+            chooseOptionForMSQ,
+            chooseOptionForTrueFalse,
+            chooseAnswerForShortAnswer,
+            calculateProgress
+        }}>
+        <div className="min-w-screen min-h-screen bg-[#f8fafc] text-[#1e293b] font-sans antialiased pb-12">
+
+            {/* Top Countdown Bar */}
+            <div className="bg-[#4a5fcd] text-white px-4 py-3.5 sm:px-8 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="font-mono text-lg font-bold tracking-wider">44:58</span>
+                </div>
+                <h2 className="text-base font-bold tracking-wide hidden sm:block">Weekly Biology Quiz</h2>
+                <div className="flex items-center gap-4">
+                    <button className="text-indigo-100 hover:text-white p-1 rounded transition-colors" title="Help / Instructions">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                        </svg>
+                    </button>
+                    <button className="bg-white hover:bg-slate-50 text-[#4a5fcd] font-bold text-sm px-5 py-2 rounded-xl shadow-sm transition-all duration-200">
+                        Submit Quiz
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Container Layout */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                {/* Left Side: Progress & Navigation Matrix Panel */}
+                <div className="lg:col-span-3 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm h-fit">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Progress</span>
+                        <span className="text-sm font-bold text-[#4a5fcd]">{progress}/{questions.length}</span>
+                    </div>
+
+                    {/* Progress Micro-Bar */}
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-6">
+                        <div className="bg-[#0f766e] h-full rounded-full" style={{ width: `${Math.floor((progress/(questions.length)) * 100)}%` }}></div>
+                    </div>
+
+                    {/* Grid of Numbered Links */}
+                    <div className="grid grid-cols-5 gap-2.5 mb-6">
+                        {questions.map((elem, index) => (
+                            <button key={elem.id} 
+                            onClick={() => setIndexForQuestion(index)}
+                            className="w-10 h-10 rounded-full bg-[#d9fcfa] text-black font-bold text-xs flex items-center justify-center transition-transform hover:scale-105">{index + 1}
+                            </button>
+                        ))}
+                        
+                        
+                    </div>
+
+                </div>
+
+                {/* Right Side: Primary Active Question Interactive Panel & Context Tools */}
+                <div className="lg:col-span-9 space-y-6">
+
+                    {questions.length > 0 && questions[indexForQuestion].type === 'MCQ' && (
+                        <MCQCard 
+                        key={questions[indexForQuestion].id}
+                        id={questions[indexForQuestion].id} 
+                        index={indexForQuestion} 
+                        nextComponent={setIndexForQuestion} />)}
+
+                    {questions.length > 0 && questions[indexForQuestion].type === 'MSQ' && (
+                        <MSQCard 
+                        key={questions[indexForQuestion].id}
+                        id={questions[indexForQuestion].id} 
+                        index={indexForQuestion} 
+                        nextComponent={setIndexForQuestion} />)}
+
+                    {questions.length > 0 && questions[indexForQuestion].type === 'TF' && (
+                        <TrueFalseCard 
+                        key={questions[indexForQuestion].id}
+                        id={questions[indexForQuestion].id} 
+                        index={indexForQuestion} 
+                        nextComponent={setIndexForQuestion} />)}
+
+                    {questions.length > 0 && questions[indexForQuestion].type === 'SA' && (
+                        <ShortAnswerCard
+                        key={questions[indexForQuestion].id} 
+                        id={questions[indexForQuestion].id} 
+                        index={indexForQuestion} 
+                        nextComponent={setIndexForQuestion} />)}
+
+                </div>
+
+            </div>
+        </div>
+        </StudentQuizProvider>
+    );
+}
