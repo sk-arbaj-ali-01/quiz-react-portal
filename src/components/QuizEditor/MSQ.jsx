@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 
-function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
+function MSQ({id, questionData, formattedIndex, deleteQuestion, addNewQuestion}) {
+
+    const sanitizePoints = (value) => {
+        const parsed = Number.parseInt(value, 10);
+        if (Number.isNaN(parsed)) {
+            return 0;
+        }
+
+        return Math.max(0, parsed);
+    };
 
     const [question, setQuestion] = useState({
        id:id,
        type: 'MSQ',
-       points: 0,
-       text: '',
-       options: ['','','',''],
-       correctAnswer: []
+       points: Math.max(0, questionData?.points ?? 0),
+       text: questionData?.text ?? '',
+       options: questionData?.options ?? ['','','',''],
+       correctAnswer: questionData?.correctAnswer ?? []
     });
 
     useEffect(()=>{
@@ -17,7 +26,7 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
 
     // Handler to change points
     const handlePointsChange = (newPoints) => {
-        setQuestion((prev) => ({...prev, points:newPoints}));
+        setQuestion((prev) => ({...prev, points:sanitizePoints(newPoints)}));
     };
 
     return (
@@ -40,8 +49,9 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Points</label>
                     <input
                         type="number"
+                        min="0"
                         value={question.points}
-                        onChange={(e) => handlePointsChange(Number.parseInt(e.target.value))}
+                        onChange={(e) => handlePointsChange(e.target.value)}
                         className="w-14 bg-[#f1f5f9] text-slate-800 font-bold text-center py-1.5 px-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#2e42a5] text-sm"
                     />
                 </div>
@@ -79,21 +89,13 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="checkbox"
                             name={`mcq-${id}`}
-                            onChange={() => {
-                                let newOptions = [];
-                                let aleadyAvailable = false;
-                                for(let elem of question.correctAnswer)
-                                {
-                                    if(elem === 0)
-                                    {
-                                        alreadyAvailable = true;
-                                        break;
-                                    }
-                                }
-                                if(aleadyAvailable === false)
-                                {
-                                    newOptions = [...question.correctAnswer, 0];
-                                }
+                            checked={question.correctAnswer.includes(0)}
+                            onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newOptions = isChecked
+                                    ? Array.from(new Set([...(question.correctAnswer ?? []), 0]))
+                                    : (question.correctAnswer ?? []).filter((value) => value !== 0);
+
                                 setQuestion((prev) => ({...prev, correctAnswer:newOptions}));
                             }}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
@@ -113,21 +115,13 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="checkbox"
                             name={`mcq-${id}`}
-                            onChange={() => {
-                                let newOptions = [];
-                                let aleadyAvailable = false;
-                                for(let elem of question.correctAnswer)
-                                {
-                                    if(elem === 1)
-                                    {
-                                        alreadyAvailable = true;
-                                        break;
-                                    }
-                                }
-                                if(aleadyAvailable === false)
-                                {
-                                    newOptions = [...question.correctAnswer, 1];
-                                }
+                            checked={question.correctAnswer.includes(1)}
+                            onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newOptions = isChecked
+                                    ? Array.from(new Set([...(question.correctAnswer ?? []), 1]))
+                                    : (question.correctAnswer ?? []).filter((value) => value !== 1);
+
                                 setQuestion((prev) => ({...prev, correctAnswer:newOptions}));
                             }}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
@@ -147,21 +141,13 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="checkbox"
                             name={`mcq-${id}`}
-                            onChange={() => {
-                                let newOptions = [];
-                                let aleadyAvailable = false;
-                                for(let elem of question.correctAnswer)
-                                {
-                                    if(elem === 2)
-                                    {
-                                        alreadyAvailable = true;
-                                        break;
-                                    }
-                                }
-                                if(aleadyAvailable === false)
-                                {
-                                    newOptions = [...question.correctAnswer, 2];
-                                }
+                            checked={question.correctAnswer.includes(2)}
+                            onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newOptions = isChecked
+                                    ? Array.from(new Set([...(question.correctAnswer ?? []), 2]))
+                                    : (question.correctAnswer ?? []).filter((value) => value !== 2);
+
                                 setQuestion((prev) => ({...prev, correctAnswer:newOptions}));
                             }}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
@@ -181,21 +167,13 @@ function MSQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="checkbox"
                             name={`mcq-${id}`}
-                            onChange={() => {
-                                let newOptions = [];
-                                let aleadyAvailable = false;
-                                for(let elem of question.correctAnswer)
-                                {
-                                    if(elem === 3)
-                                    {
-                                        alreadyAvailable = true;
-                                        break;
-                                    }
-                                }
-                                if(aleadyAvailable === false)
-                                {
-                                    newOptions = [...question.correctAnswer, 3];
-                                }
+                            checked={question.correctAnswer.includes(3)}
+                            onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newOptions = isChecked
+                                    ? Array.from(new Set([...(question.correctAnswer ?? []), 3]))
+                                    : (question.correctAnswer ?? []).filter((value) => value !== 3);
+
                                 setQuestion((prev) => ({...prev, correctAnswer:newOptions}));
                             }}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"

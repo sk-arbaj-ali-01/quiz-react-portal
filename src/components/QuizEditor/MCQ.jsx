@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 
-function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
+function MCQ({id, questionData, formattedIndex, deleteQuestion, addNewQuestion}) {
+
+    const sanitizePoints = (value) => {
+        const parsed = Number.parseInt(value, 10);
+        if (Number.isNaN(parsed)) {
+            return 0;
+        }
+
+        return Math.max(0, parsed);
+    };
 
     const [question, setQuestion] = useState({
        id:id,
        type: 'MCQ',
-       points: 0,
-       text: '',
-       options: ['','','',''],
-       correctAnswer: 0 
+       points: Math.max(0, questionData?.points ?? 0),
+       text: questionData?.text ?? '',
+       options: questionData?.options ?? ['','','',''],
+       correctAnswer: questionData?.correctAnswer ?? 0 
     });
 
     useEffect(()=>{
@@ -17,7 +26,7 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
 
     // Handler to change points
     const handlePointsChange = (newPoints) => {
-        setQuestion((prev) => ({...prev, points:newPoints}));
+        setQuestion((prev) => ({...prev, points:sanitizePoints(newPoints)}));
     };
 
     return (
@@ -40,8 +49,9 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Points</label>
                     <input
                         type="number"
+                        min="0"
                         value={question.points}
-                        onChange={(e) => handlePointsChange(Number.parseInt(e.target.value))}
+                        onChange={(e) => handlePointsChange(e.target.value)}
                         className="w-14 bg-[#f1f5f9] text-slate-800 font-bold text-center py-1.5 px-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#2e42a5] text-sm"
                     />
                 </div>
@@ -79,6 +89,7 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="radio"
                             name={`mcq-${id}`}
+                            checked={question.correctAnswer === 0}
                             onChange={() => setQuestion((prev) => ({...prev, correctAnswer:0}))}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
                         />
@@ -97,6 +108,7 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="radio"
                             name={`mcq-${id}`}
+                            checked={question.correctAnswer === 1}
                             onChange={() => setQuestion((prev) => ({...prev, correctAnswer:1}))}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
                         />
@@ -115,6 +127,7 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="radio"
                             name={`mcq-${id}`}
+                            checked={question.correctAnswer === 2}
                             onChange={() => setQuestion((prev) => ({...prev, correctAnswer:2}))}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
                         />
@@ -133,6 +146,7 @@ function MCQ({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                         <input
                             type="radio"
                             name={`mcq-${id}`}
+                            checked={question.correctAnswer === 3}
                             onChange={() => setQuestion((prev) => ({...prev, correctAnswer:3}))}
                             className="w-4 h-4 text-[#2e42a5] focus:ring-[#2e42a5]"
                         />

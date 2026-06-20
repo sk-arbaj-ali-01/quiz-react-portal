@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
 
-function ShortAnswer({id, formattedIndex, deleteQuestion, addNewQuestion}) {
+function ShortAnswer({id, questionData, formattedIndex, deleteQuestion, addNewQuestion}) {
+
+    const sanitizePoints = (value) => {
+        const parsed = Number.parseInt(value, 10);
+        if (Number.isNaN(parsed)) {
+            return 0;
+        }
+
+        return Math.max(0, parsed);
+    };
 
     const [question, setQuestion] = useState({
        id:id,
        type: 'SA',
-       points: 0,
-       text: ''
+       points: Math.max(0, questionData?.points ?? 0),
+       text: questionData?.text ?? ''
     });
 
     useEffect(()=>{
@@ -15,7 +24,7 @@ function ShortAnswer({id, formattedIndex, deleteQuestion, addNewQuestion}) {
 
     // Handler to change points
     const handlePointsChange = (newPoints) => {
-        setQuestion((prev) => ({...prev, points:newPoints}));
+        setQuestion((prev) => ({...prev, points:sanitizePoints(newPoints)}));
     };
 
     return (
@@ -38,8 +47,9 @@ function ShortAnswer({id, formattedIndex, deleteQuestion, addNewQuestion}) {
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Points</label>
                     <input
                         type="number"
+                        min="0"
                         value={question.points}
-                        onChange={(e) => handlePointsChange(Number.parseInt(e.target.value))}
+                        onChange={(e) => handlePointsChange(e.target.value)}
                         className="w-14 bg-[#f1f5f9] text-slate-800 font-bold text-center py-1.5 px-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#2e42a5] text-sm"
                     />
                 </div>

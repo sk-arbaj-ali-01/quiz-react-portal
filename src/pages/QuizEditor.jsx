@@ -1,66 +1,359 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import MCQ from '../components/QuizEditor/MCQ';
 import MSQ from '../components/QuizEditor/MSQ';
 import TrueFalse from '../components/QuizEditor/TrueFalse';
 import ShortAnswer from '../components/QuizEditor/ShortAnswer';
 
 export default function QuizEditor() {
-    const [questions, setQuestions] = useState([]);
+    const USER_ID = '11111111-1111-1111-1111-111111111111';
 
-    useEffect(()=>{
-        console.log(questions);
-    }, [questions]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState("");
+    const [questions, setQuestions] = useState([]);
+    const [allFetchedGroupIds, setAllFetchedGroupIds] = useState([]);
+    const [groupHasExistingQuestions, setGroupHasExistingQuestions] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+
+    const normalizeOptions = (options = []) => {
+        const normalized = options.map((option) => {
+            if (typeof option === 'string') {
+                return { optionId: crypto.randomUUID(), optionText: option, isCorrect: false };
+            }
+
+            return {
+                optionId: option?.optionId ?? crypto.randomUUID(),
+                optionText: option?.optionText ?? '',
+                isCorrect: Boolean(option?.isCorrect),
+            };
+        });
+
+        while (normalized.length < 4) {
+            normalized.push({ optionId: crypto.randomUUID(), optionText: '', isCorrect: false });
+        }
+
+        return normalized.slice(0, 4);
+    };
+
+    const normalizeMcqQuestion = (question) => {
+        const normalizedOptions = normalizeOptions(question?.options ?? []);
+        const correctAnswerIndex = normalizedOptions.findIndex((option) => option.isCorrect === true);
+
+        return {
+            id: question?.questionId ?? question?.id,
+            questionId: question?.questionId ?? question?.id,
+            type: 'MCQ',
+            text: question?.text ?? '',
+            points: question?.points ?? 0,
+            options: normalizedOptions.map((option) => option.optionText),
+            optionIds: normalizedOptions.map((option) => option.optionId),
+            correctAnswer: correctAnswerIndex >= 0 ? correctAnswerIndex : 0,
+        };
+    };
+
+    const normalizeMsqQuestion = (question) => {
+        const normalizedOptions = normalizeOptions(question?.options ?? []);
+
+        return {
+            id: question?.questionId ?? question?.id,
+            questionId: question?.questionId ?? question?.id,
+            type: 'MSQ',
+            text: question?.text ?? '',
+            points: question?.points ?? 0,
+            options: normalizedOptions.map((option) => option.optionText),
+            optionIds: normalizedOptions.map((option) => option.optionId),
+            correctAnswer: normalizedOptions
+                .map((option, index) => (option.isCorrect ? index : null))
+                .filter((value) => value !== null),
+        };
+    };
+
+    const mapQuestionWithType = (question, type) => {
+        if (type === 'MCQ') return normalizeMcqQuestion(question);
+        if (type === 'MSQ') return normalizeMsqQuestion(question);
+
+        return {
+            ...question,
+            id: question.id ?? question.questionId,
+            questionId: question.questionId ?? question.id,
+            type
+        };
+    };
+
+    const normalizeQuestionsPayload = (data) => {
+        if (!data) {
+            return [];
+        }
+
+        if (Array.isArray(data)) {
+            return data.map((question) => ({
+                ...question,
+                id: question.id ?? question.questionId
+            }));
+        }
+
+        const mappedQuestions = [
+            ...(Array.isArray(data.mcq) ? data.mcq.map((question) => mapQuestionWithType(question, 'MCQ')) : []),
+            ...(Array.isArray(data.msq) ? data.msq.map((question) => mapQuestionWithType(question, 'MSQ')) : []),
+            ...(Array.isArray(data.tf) ? data.tf.map((question) => mapQuestionWithType(question, 'TF')) : []),
+            ...(Array.isArray(data.sa) ? data.sa.map((question) => mapQuestionWithType(question, 'SA')) : [])
+        ];
+
+        return mappedQuestions;
+    };
+
+    const handleSubmit = async () => {
+        if (!selectedGroup) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        let finalQuestions = {"groupId": selectedGroup,"mcq" : [], "msq" : [], "tf" : [], "sa" : []};
+
+        const buildCreateOptionsPayload = (question) => {
+            return (question.options ?? [])
+                .map((optionText) => (optionText ?? '').trim())
+                .filter((optionText) => optionText.length > 0);
+        };
+
+        const buildUpdateOptionsPayload = (question) => {
+            return (question.options ?? [])
+                .map((optionText) => (optionText ?? '').trim())
+                .filter((optionText) => optionText.length > 0);
+        };
+
+        questions.forEach(elem => {
+            if(elem.type === 'MCQ'){
+                finalQuestions.mcq.push({
+                    questionId: elem.id,
+                    type: elem.type,
+                    text: elem.text,
+                    points: elem.points,
+                    options: groupHasExistingQuestions ? buildUpdateOptionsPayload(elem) : buildCreateOptionsPayload(elem),
+                    ...(groupHasExistingQuestions ? { correctAnswer: elem.correctAnswer } : {})
+                });
+            }
+            else if(elem.type === 'MSQ'){
+                finalQuestions.msq.push({
+                    questionId: elem.id,
+                    type: elem.type,
+                    text: elem.text,
+                    points: elem.points,
+                    options: groupHasExistingQuestions ? buildUpdateOptionsPayload(elem) : buildCreateOptionsPayload(elem),
+                    ...(groupHasExistingQuestions ? { correctAnswer: elem.correctAnswer } : {})
+                });
+            }
+            else if(elem.type === 'TF'){
+                finalQuestions.tf.push({
+                    questionId: elem.id,
+                    type: elem.type,
+                    text: elem.text,
+                    points: elem.points,
+                    correctAnswer: elem.correctAnswer,
+                });
+            }
+            else{
+                finalQuestions.sa.push({
+                    questionId: elem.id,
+                    type: elem.type,
+                    text: elem.text,
+                    points: elem.points,
+                });
+            }
+        })
+
+        try {
+            let response = await fetch(`https://localhost:7087/v1/questions`,{
+                method: groupHasExistingQuestions ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": USER_ID,
+                },
+                body: JSON.stringify(finalQuestions)
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+
+                if (!groupHasExistingQuestions && response.status === 400 && errorMessage.includes('questionCreateRequestDto')) {
+                    response = await fetch(`https://localhost:7087/v1/questions`,{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-user-id": USER_ID,
+                        },
+                        body: JSON.stringify({ questionCreateRequestDto: finalQuestions })
+                    });
+
+                    if (!response.ok) {
+                        const retriedErrorMessage = await response.text();
+                        throw new Error(retriedErrorMessage || 'Request failed');
+                    }
+                } else {
+                    throw new Error(errorMessage || 'Request failed');
+                }
+            }
+
+            setToastMessage(groupHasExistingQuestions ? 'Questions updated successfully.' : 'Questions created successfully.');
+            setTimeout(() => setToastMessage(""), 3000);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
+        const fetchGroupData = async () => {
+            let response = await fetch("https://localhost:7087/v1/groups?page=1&perPage=10");
+            let data = await response.json();
+
+            setAllFetchedGroupIds(data.records);
+        }
+
+        fetchGroupData();
+    }, []);
+
+    useEffect(() => {
+        const fetchQuestionsByGroup = async () => {
+            if (!selectedGroup) {
+                setQuestions([]);
+                setGroupHasExistingQuestions(false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://localhost:7087/v1/questions/${selectedGroup}`);
+
+                if (!response.ok) {
+                    setQuestions([]);
+                    setGroupHasExistingQuestions(false);
+                    return;
+                }
+
+                const data = await response.json();
+                const normalizedQuestions = normalizeQuestionsPayload(data);
+
+                setQuestions(normalizedQuestions);
+                setGroupHasExistingQuestions(normalizedQuestions.length > 0);
+            } catch {
+                setQuestions([]);
+                setGroupHasExistingQuestions(false);
+            }
+        };
+
+        fetchQuestionsByGroup();
+    }, [selectedGroup]);
 
     // Handler to delete a question
     const deleteQuestion = (id) => {
-        setQuestions(questions.filter(q => q.id !== id));
+        setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== id));
     };
 
     const addNewQuestion = (question) => {
-        setQuestions(questions.map((elem) => {
+        setQuestions((prevQuestions) => prevQuestions.map((elem) => {
             if (elem.id === question.id) {
-                elem.text = question.text;
-                elem.points = question.points;
-                elem.options && (elem.options = question.options);
-                elem.correctAnswer = question.correctAnswer;
-                return elem;
+                return {
+                    ...elem,
+                    text: question.text,
+                    points: question.points,
+                    options: question.options,
+                    optionIds: question.optionIds ?? elem.optionIds,
+                    correctAnswer: question.correctAnswer
+                };
             }
             return elem;
-        }))
+        }));
     };
 
     // Handler to add new specific templates
     const addQuestionCard = (type) => {
-        const newId = questions.length > 0 ? Math.max(...questions.map(q => q.id)) + 1 : 1;
+        const newId = crypto.randomUUID();
         let baseCard = {
             id: newId,
+            questionId: newId,
             points: 0,
             text: '',
         };
 
         if (type === 'MCQ') {
-            baseCard = { ...baseCard, type: 'MCQ', options: ['', '', '', ''], correctAnswer: 0 };
+            baseCard = { ...baseCard, type: 'MCQ', options: ['', '', '', ''], optionIds: [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()], correctAnswer: 0 };
         } else if (type === 'MSQ') {
-            baseCard = { ...baseCard, type: 'MSQ', options: ['', '', '', ''], correctAnswer: [] };
+            baseCard = { ...baseCard, type: 'MSQ', options: ['', '', '', ''], optionIds: [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()], correctAnswer: [] };
         } else if (type === 'TF') {
             baseCard = { ...baseCard, type: 'TF', correctAnswer: true };
         } else if (type === 'SA') {
             baseCard = { ...baseCard, type: 'SA' };
         }
 
-        setQuestions([...questions, baseCard]);
+        setQuestions((prevQuestions) => [...prevQuestions, baseCard]);
     };
 
     return (
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-[#f8fafc] text-[#1e293b] font-sans antialiased min-h-screen relative">
 
+            {toastMessage && (
+                <div className="fixed top-6 right-6 z-50 bg-emerald-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg">
+                    {toastMessage}
+                </div>
+            )}
+
             {/* Header Info Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-[#2e42a5] tracking-tight">Editor: Cell Structures & Functions</h1>
+                    <h1 className="text-3xl font-bold text-[#2e42a5] tracking-tight">
+                        Editor: Quiz questions and points
+                    </h1>
                     <p className="text-slate-500 mt-1 text-sm sm:text-base">
-                        Drafting questions for the upcoming mid-term assessment. Questions will be automatically randomized during the student session.
+                        Drafting questions for the upcoming assessment.
                     </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Question Group Dropdown */}
+                    <select
+                        value={selectedGroup}
+                        onChange={(e) => setSelectedGroup(e.target.value)}
+                        disabled={isSubmitting}
+                        className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e42a5] disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    >
+                        <option value="">Select Question Group</option>
+                        {allFetchedGroupIds.map(elem => (
+                            <option key={elem.groupId} value={elem.groupId}>{elem.groupName}</option>
+                        ))}
+                    </select>
+
+                    {/* Submit Quiz Button */}
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-[#2e42a5] text-white rounded-lg font-medium hover:bg-[#24358a] transition disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <svg
+                                    className="w-4 h-4 animate-spin"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    />
+                                </svg>
+                                Submitting...
+                            </>
+                        ) : (
+                            "Submit Quiz"
+                        )}
+                    </button>
                 </div>
             </div>
 
@@ -69,38 +362,42 @@ export default function QuizEditor() {
                 {questions.map((question, index) => {
                     const formattedIndex = String(index + 1).padStart(2, '0');
 
-                    if(question.type === 'MCQ') 
-                        return <MCQ 
-                                key={question.id}
-                                id={question.id} 
-                                formattedIndex={formattedIndex}
-                                deleteQuestion={deleteQuestion}
-                                addNewQuestion={addNewQuestion}
-                                />
-                    else if(question.type === 'MSQ')
-                        return <MSQ 
-                                key={question.id}
-                                id={question.id} 
-                                formattedIndex={formattedIndex}
-                                deleteQuestion={deleteQuestion}
-                                addNewQuestion={addNewQuestion}
-                                />
-                    else if(question.type === 'TF')
+                    if (question.type === 'MCQ')
+                        return <MCQ
+                            key={question.id}
+                            id={question.id}
+                            questionData={question}
+                            formattedIndex={formattedIndex}
+                            deleteQuestion={deleteQuestion}
+                            addNewQuestion={addNewQuestion}
+                        />
+                    else if (question.type === 'MSQ')
+                        return <MSQ
+                            key={question.id}
+                            id={question.id}
+                            questionData={question}
+                            formattedIndex={formattedIndex}
+                            deleteQuestion={deleteQuestion}
+                            addNewQuestion={addNewQuestion}
+                        />
+                    else if (question.type === 'TF')
                         return <TrueFalse
-                                key={question.id} 
-                                id={question.id} 
-                                formattedIndex={formattedIndex}
-                                deleteQuestion={deleteQuestion}
-                                addNewQuestion={addNewQuestion}
-                                />
+                            key={question.id}
+                            id={question.id}
+                            questionData={question}
+                            formattedIndex={formattedIndex}
+                            deleteQuestion={deleteQuestion}
+                            addNewQuestion={addNewQuestion}
+                        />
                     else
-                        return <ShortAnswer 
-                                key={question.id}
-                                id={question.id} 
-                                formattedIndex={formattedIndex}
-                                deleteQuestion={deleteQuestion}
-                                addNewQuestion={addNewQuestion}
-                                />
+                        return <ShortAnswer
+                            key={question.id}
+                            id={question.id}
+                            questionData={question}
+                            formattedIndex={formattedIndex}
+                            deleteQuestion={deleteQuestion}
+                            addNewQuestion={addNewQuestion}
+                        />
                 })}
                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-lg max-w-3xl mx-auto border-t-4 border-[#2e42a5]" >
                     <p className="text-center text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">
