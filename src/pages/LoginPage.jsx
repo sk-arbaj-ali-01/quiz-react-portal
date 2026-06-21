@@ -1,11 +1,11 @@
-import React from 'react';
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL || '/api/sign-in';
+const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL || '/api/v1/users/login';
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -38,6 +38,8 @@ export default function LoginPage() {
                     : await response.text();
 
                 localStorage.setItem('authData', JSON.stringify(data));
+                window.dispatchEvent(new Event('storage'));
+                navigate("/");
             }
         } finally {
             setIsLoading(false);
@@ -51,12 +53,6 @@ export default function LoginPage() {
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                 <h1 className="text-3xl font-black tracking-tight text-[#4a5fcd]">QuizMaster</h1>
                 <h2 className="mt-3 text-2xl font-bold text-slate-900">Sign in to your account</h2>
-                <p className="mt-2 text-sm text-slate-500 font-medium">
-                    Or{' '}
-                    <a href="#register" className="font-bold text-[#4a5fcd] hover:underline">
-                        request credentials from your administrator
-                    </a>
-                </p>
             </div>
 
             {/* Main Form Interactive Card */}
@@ -104,7 +100,7 @@ export default function LoginPage() {
                                     type="password"
                                     autoComplete="current-password"
                                     required
-                                    placeholder="••••••••"
+                                    placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
                                     className="w-full bg-[#f8fafc] border border-slate-200/80 rounded-xl pl-11 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#4a5fcd] focus:ring-1 focus:ring-[#4a5fcd] transition-all"
                                 />
                             </div>
