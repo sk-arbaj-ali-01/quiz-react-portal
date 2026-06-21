@@ -62,8 +62,8 @@ function MSQCard({id, index, nextComponent}) {
                     <input
                         value={qt.options[0].id}
                         checked={isChecked[0]}
-                        onChange={() => {
-                            chooseOptionForMSQ(qt.id, qt.options[0].id);
+                        onChange={(e) => {
+                            chooseOptionForMSQ(qt.id, qt.options[0].id, e.target.checked);
                             handleOptionCheck(0);
                         }}
                         type="checkbox"
@@ -76,8 +76,8 @@ function MSQCard({id, index, nextComponent}) {
                     <input
                         value={qt.options[1].id}
                         checked={isChecked[1]}
-                        onChange={() => {
-                            chooseOptionForMSQ(qt.id, qt.options[1].id);
+                        onChange={(e) => {
+                            chooseOptionForMSQ(qt.id, qt.options[1].id, e.target.checked);
                             handleOptionCheck(1);
                         }}
                         type="checkbox"
@@ -90,8 +90,8 @@ function MSQCard({id, index, nextComponent}) {
                     <input
                         value={qt.options[2].id}
                         checked={isChecked[2]}
-                        onChange={() => {
-                            chooseOptionForMSQ(qt.id, qt.options[2].id);
+                        onChange={(e) => {
+                            chooseOptionForMSQ(qt.id, qt.options[2].id, e.target.checked);
                             handleOptionCheck(2);
                         }}
                         type="checkbox"
@@ -104,8 +104,8 @@ function MSQCard({id, index, nextComponent}) {
                     <input
                         value={qt.options[3].id}
                         checked={isChecked[3]}
-                        onChange={() => {
-                            chooseOptionForMSQ(qt.id, qt.options[3].id);
+                        onChange={(e) => {
+                            chooseOptionForMSQ(qt.id, qt.options[3].id, e.target.checked);
                             handleOptionCheck(3);
                         }}
                         type="checkbox"
