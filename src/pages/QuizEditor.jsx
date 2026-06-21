@@ -3,9 +3,13 @@ import MCQ from '../components/QuizEditor/MCQ';
 import MSQ from '../components/QuizEditor/MSQ';
 import TrueFalse from '../components/QuizEditor/TrueFalse';
 import ShortAnswer from '../components/QuizEditor/ShortAnswer';
+import { useNavigate } from 'react-router-dom';
 
 export default function QuizEditor() {
     const USER_ID = '11111111-1111-1111-1111-111111111111';
+
+    const QUESTIONS_URL = import.meta.env.VITE_QUESTIONS_URL;
+    const GROUPS_URL = import.meta.env.VITE_GROUPS_URL;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState("");
@@ -13,6 +17,7 @@ export default function QuizEditor() {
     const [allFetchedGroupIds, setAllFetchedGroupIds] = useState([]);
     const [groupHasExistingQuestions, setGroupHasExistingQuestions] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
+    const navigate = useNavigate();
 
     const normalizeOptions = (options = []) => {
         const normalized = options.map((option) => {
@@ -162,7 +167,7 @@ export default function QuizEditor() {
         })
 
         try {
-            let response = await fetch(`https://localhost:7087/v1/questions`,{
+            let response = await fetch(QUESTIONS_URL,{
                 method: groupHasExistingQuestions ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -175,7 +180,7 @@ export default function QuizEditor() {
                 const errorMessage = await response.text();
 
                 if (!groupHasExistingQuestions && response.status === 400 && errorMessage.includes('questionCreateRequestDto')) {
-                    response = await fetch(`https://localhost:7087/v1/questions`,{
+                    response = await fetch(QUESTIONS_URL,{
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -202,10 +207,24 @@ export default function QuizEditor() {
 
     useEffect(() => {
         const fetchGroupData = async () => {
-            let response = await fetch("https://localhost:7087/v1/groups?page=1&perPage=10");
-            let data = await response.json();
+            const authData = localStorage.getItem("authData");
+            if(authData)
+            {
+                const parsedData = JSON.parse(authData);
 
-            setAllFetchedGroupIds(data.records);
+                let response = await fetch(`${GROUPS_URL}?page=1&perPage=10`,{
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${parsedData.accessToken}`
+                    }
+                });
+                let data = await response.json();
+
+                setAllFetchedGroupIds(data.records);
+            }
+            else{
+                navigate("/login");
+            }
         }
 
         fetchGroupData();
@@ -220,7 +239,7 @@ export default function QuizEditor() {
             }
 
             try {
-                const response = await fetch(`https://localhost:7087/v1/questions/${selectedGroup}`);
+                const response = await fetch(`${QUESTIONS_URL}/${selectedGroup}`);
 
                 if (!response.ok) {
                     setQuestions([]);
