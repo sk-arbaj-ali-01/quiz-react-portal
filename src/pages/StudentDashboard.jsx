@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function StudentDashboard() {
   const [studentName, setStudentName] = useState('Student');
   const [studentEmail, setStudentEmail] = useState('student@university.edu');
+  const navigate = useNavigate();
 
   useEffect(() => {
     try {
@@ -13,6 +14,9 @@ export default function StudentDashboard() {
         // Fallback checks to populate fields gracefully if names exist in storage
         if (parsedData?.fullName) setStudentName(parsedData.fullName);
         if (parsedData?.emailId) setStudentEmail(parsedData.emailId);
+      }
+      else{
+        navigate("/login");
       }
     } catch (e) {
       console.error("Failed to recover profile parameters:", e);

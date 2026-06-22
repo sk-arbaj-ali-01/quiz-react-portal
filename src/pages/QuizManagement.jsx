@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useHandleFetch from "../Utilities/useHandleFetch";
+import UnAuthenticatedException from "../Exceptions/UnAuthenticatedException";
 
 function QuizManagement() {
   const [toggleModal, setToggleModal] = useState(false);
@@ -26,17 +28,30 @@ function QuizManagement() {
   const [examDuration, setExamDuration] = useState(0);
   const [authData, setAuthData] = useState({});
   const navigate = useNavigate();
+  const handleFetch = useHandleFetch();
+
+  const GROUPS_URL = import.meta.env.VITE_GROUPS_URL;
 
   async function submitQuestionGroupData() {
     let group = { groupName, description, isActive, activeForDays, examDuration };
 
-    await fetch('api/v1/groups', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(group)
-    });
+    await handleFetch(async () => {
+      const authData = localStorage.getItem("authData");
+
+      if (authData === null) {
+        throw new UnAuthenticatedException("Please login.", 401);
+      }
+
+      const parsedData = JSON.parse(authData);
+      await fetch(GROUPS_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${parsedData.accessToken}`
+        },
+        body: JSON.stringify(group)
+      });
+    }, null);
 
     setToggleModal(false);
   }
@@ -55,7 +70,7 @@ function QuizManagement() {
 
   async function getAllGroupData(authToken) {
     console.log(authToken);
-    let response = await fetch('api/v1/groups?page=1&perPage=10',{
+    let response = await fetch('api/v1/groups?page=1&perPage=10', {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${authToken}`
@@ -95,13 +110,12 @@ function QuizManagement() {
 
   useEffect(() => {
     const authData = localStorage.getItem("authData");
-    if(authData)
-    {
+    if (authData) {
       const parsedData = JSON.parse(authData);
       setAuthData(parsedData);
       getAllGroupData(parsedData?.accessToken);
     }
-    else{
+    else {
       navigate('/login');
     }
   }, []);

@@ -8,8 +8,9 @@ import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
-import { RouterProvider, createBrowserRouter } from "react-router-dom"
-import Layout from "./pages/Layout"
+import RelateTeacherToStudents from "./pages/RelateTeacherToStudents";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Layout from "./pages/Layout";
 
 function MainDashboardDirector() {
   try {
@@ -58,6 +59,14 @@ const router = createBrowserRouter([
       {
         path: "question-management",
         element: <QuizEditor />
+      },
+      {
+        path: "start-quiz/:groupIdFromRoute",
+        element: <StudentQuizView />
+      },
+      {
+        path: "find-teachers",
+        element: <RelateTeacherToStudents />
       }
     ]
   }

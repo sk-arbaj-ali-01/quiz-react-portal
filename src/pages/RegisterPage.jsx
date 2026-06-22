@@ -62,10 +62,15 @@ export default function RegisterPage() {
       if (!response.ok) {
         throw new Error(`Server execution failure with status code: ${response.status}`);
       }
+      if(response.status === 401)
+        throw new Error(`You are not authenticated. Please login again: ${response.status}`);
+      
+      if(response.status === 403)
+        throw new Error(`You are not authorized to access the resource: ${response.status}`);
 
     } catch (error) {
       console.error('Registration processing failed:', error);
-      triggerToast('Registration failed. Please verify connection credentials.', 'error');
+      triggerToast(error.message, 'error');
     } finally {
       setIsSubmitting(false);
     }
