@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useHandleFetch from '../Utilities/useHandleFetch';
+import UnAuthenticatedException from '../Exceptions/UnAuthenticatedException';
+import RecordNotFoundException from '../Exceptions/RecordNotFoundException';
 
 const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL || '/api/v1/users/login';
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const handleFetch = useHandleFetch();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -22,28 +26,41 @@ export default function LoginPage() {
 
         setIsLoading(true);
 
-        try {
-            const response = await fetch(SIGN_IN_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+        await handleFetch(async () => {
+            try {
+                const response = await fetch(SIGN_IN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
 
-            if (response.status === 200) {
-                const contentType = response.headers.get('content-type') || '';
-                const data = contentType.includes('application/json')
-                    ? await response.json()
-                    : await response.text();
+                if (response.status === 200) {
+                    const contentType = response.headers.get('content-type') || '';
+                    const data = contentType.includes('application/json')
+                        ? await response.json()
+                        : await response.text();
 
-                localStorage.setItem('authData', JSON.stringify(data));
-                window.dispatchEvent(new Event('storage'));
-                navigate("/");
+                    localStorage.setItem('authData', JSON.stringify(data));
+                    window.dispatchEvent(new Event('storage'));
+                    navigate("/");
+                }
+
+                if (response.status === 404) {
+                    const data = await response.json();
+                    throw new RecordNotFoundException(`${data?.message}: ${data?.statusCode}`);
+                }
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(`${data?.message}: ${data?.statusCode}`);
+                }
+
+            } finally {
+                setIsLoading(false);
             }
-        } finally {
-            setIsLoading(false);
-        }
+        }, null);
     };
 
     return (

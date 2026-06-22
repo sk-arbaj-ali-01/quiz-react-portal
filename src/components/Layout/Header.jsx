@@ -86,6 +86,9 @@ export default function Header() {
                 <Link to="#active-quizzes" className="text-indigo-100 hover:text-white transition-colors">
                   Available Tests
                 </Link>
+                <Link to="find-teachers" className="text-indigo-100 hover:text-white transition-colors">
+                  Find Teachers
+                </Link>
                 <Link to="#my-results" className="text-indigo-100 hover:text-white transition-colors">
                   Past Grades
                 </Link>

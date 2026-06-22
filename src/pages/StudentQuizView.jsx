@@ -4,6 +4,7 @@ import MCQCard from '../components/StudentQuizView/MCQCard';
 import MSQCard from '../components/StudentQuizView/MSQCard';
 import TrueFalseCard from '../components/StudentQuizView/TrueFalseCard';
 import {StudentQuizProvider} from '../contexts/StudentQuizContext';
+import { useParams } from 'react-router-dom';
 
 export default function StudentQuizView() {
     const DEFAULT_TIMER_SECONDS = 20 * 60;
@@ -15,6 +16,10 @@ export default function StudentQuizView() {
     const [timeLeftInSeconds, setTimeLeftInSeconds] = useState(DEFAULT_TIMER_SECONDS);
     const hasAutoSubmittedRef = useRef(false);
     const progress = questions.filter((elem) => elem.answered === true).length;
+
+    const groupIdFromRoute = useParams("groupIdFromRoute");
+
+    const QUESTION_URL = import.meta.env.VITE_QUESTIONS_URL;
 
     const formatTimer = (totalSeconds) => {
         const safeSeconds = Math.max(0, totalSeconds ?? 0);
@@ -137,10 +142,7 @@ export default function StudentQuizView() {
     };
 
     useEffect(()=>{
-        const groupIdFromQuery = new URLSearchParams(window.location.search).get('groupId');
-        const endpoint = groupIdFromQuery
-            ? `https://localhost:7087/v1/questions/${groupIdFromQuery}`
-            : "https://localhost:7087/v1/questions";
+        const endpoint = `${groupIdFromRoute}/${groupIdFromQuery}`;
 
         fetch(endpoint)
         .then(res => res.json())
