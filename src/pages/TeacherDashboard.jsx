@@ -40,7 +40,7 @@ export default function TeacherDashboard() {
           {/* Top Right: Create New Quiz Button Link */}
           <div className="self-start md:self-center border-t md:border-t-0 border-slate-50 pt-3 md:pt-0 w-full md:w-auto flex justify-end">
             <Link
-              to="/quiz/create"
+              to="/quiz-management"
               className="inline-flex items-center gap-2 bg-[#4a5fcd] hover:bg-[#3b4da6] text-white text-sm font-bold px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 w-full md:w-auto justify-center"
             >
               <svg className="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
