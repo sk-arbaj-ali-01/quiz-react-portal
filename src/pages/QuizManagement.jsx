@@ -52,6 +52,23 @@ function QuizManagement() {
         body: JSON.stringify(group)
       });
     }, null);
+    await handleFetch(async () => {
+      const authData = localStorage.getItem("authData");
+
+      if (authData === null) {
+        throw new UnAuthenticatedException("Please login.", 401);
+      }
+
+      const parsedData = JSON.parse(authData);
+      await fetch(GROUPS_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${parsedData.accessToken}`
+        },
+        body: JSON.stringify(group)
+      });
+    }, null);
 
     setToggleModal(false);
   }
