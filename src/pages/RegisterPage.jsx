@@ -24,16 +24,13 @@ export default function RegisterPage() {
     const fullName = formData.get('full_name');
     const emailId = formData.get('email_id');
     const password = formData.get('password');
-    const rawRole = formData.get('role');
-
-    // Enforcing strict matching backend DTO constraints: TEACHER vs STUDENT
-    const mappedRole = rawRole === 'professor' ? 'TEACHER' : 'STUDENT';
+    const role = formData.get('role');
 
     const payload = {
       fullName,
       emailId,
       password,
-      role: mappedRole
+      role
     };
 
     try {

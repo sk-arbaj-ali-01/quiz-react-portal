@@ -52,15 +52,34 @@ function QuizManagement() {
         body: JSON.stringify(group)
       });
     }, null);
+    await handleFetch(async () => {
+      const authData = localStorage.getItem("authData");
+
+      if (authData === null) {
+        throw new UnAuthenticatedException("Please login.", 401);
+      }
+
+      const parsedData = JSON.parse(authData);
+      await fetch(GROUPS_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${parsedData.accessToken}`
+        },
+        body: JSON.stringify(group)
+      });
+    }, null);
 
     setToggleModal(false);
   }
 
   async function submitEditableQuestionGroupData(groupId) {
-    await fetch(`api/v1/groups/${groupId}`, {
+    console.log(`${GROUPS_URL}/${groupId}`);
+    await fetch(`${GROUPS_URL}/${groupId}`, {
       method: 'PUT',
-      headers: {
-        "Content-Type": "application/json"
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization" : `Bearer ${authData.accessToken}`
       },
       body: JSON.stringify(editableGroupData)
     });
@@ -69,8 +88,8 @@ function QuizManagement() {
   }
 
   async function getAllGroupData(authToken) {
-    console.log(authToken);
-    let response = await fetch('api/v1/groups?page=1&perPage=10', {
+
+    let response = await fetch(`${GROUPS_URL}?page=1&perPage=10`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${authToken}`
@@ -82,10 +101,11 @@ function QuizManagement() {
   }
 
   async function DeleteQuestionGroup(groupId) {
-    await fetch(`api/v1/groups/${groupId}`, {
+    await fetch(`${GROUPS_URL}/${groupId}`, {
       method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json"
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization" : `Bearer ${authData.accessToken}`
       }
     });
 
@@ -93,7 +113,12 @@ function QuizManagement() {
   }
 
   async function fetchGroupDataByGroupId(groupId) {
-    let response = await fetch(`api/v1/groups/${groupId}`);
+    let response = await fetch(`${GROUPS_URL}/${groupId}`,{
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization" : `Bearer ${authData.accessToken}`
+      }
+    });
     let data = await response.json();
 
     const resolvedGroup = data?.record ?? data?.data ?? data;
@@ -359,7 +384,7 @@ function QuizManagement() {
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Is Active</label>
                   <label className="relative inline-flex items-center cursor-pointer group">
                     <input type="checkbox" className="sr-only peer" checked={editableGroupData.isActive}
-                      onChange={(e) => setEditableGroupData({ ...editableGroupData, isActive: e.target.value })} />
+                      onChange={(e) => setEditableGroupData({ ...editableGroupData, isActive: !editableGroupData.isActive })} />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4355b4]"></div>
                   </label>
                 </div>
@@ -367,7 +392,7 @@ function QuizManagement() {
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Is Archived</label>
                   <label className="relative inline-flex items-center cursor-pointer group">
                     <input type="checkbox" className="sr-only peer" checked={editableGroupData.isArchived}
-                      onChange={(e) => setEditableGroupData({ ...editableGroupData, isArchived: e.target.value })} />
+                      onChange={(e) => setEditableGroupData({ ...editableGroupData, isArchived: !editableGroupData.isArchived })} />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4355b4]"></div>
                   </label>
                 </div>
