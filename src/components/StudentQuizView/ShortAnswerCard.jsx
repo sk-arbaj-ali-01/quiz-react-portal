@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import useStudentQuizContext from "../../contexts/StudentQuizContext";
 
 function ShortAnswerCard({id, index, nextComponent}){
@@ -39,7 +38,7 @@ function ShortAnswerCard({id, index, nextComponent}){
             {/* Input Response Textarea Area */}
             <div className="mb-6 relative">
               <textarea 
-                value={qt.answer}
+                value={qt.answer || ""}
                 placeholder="Type your explanation here..."
                 className="w-full bg-[#f8fafc] border border-slate-200/80 rounded-2xl p-5 text-slate-800 text-sm sm:text-base focus:outline-none focus:border-[#4a5fcd] focus:ring-1 focus:ring-[#4a5fcd] resize-none min-h-[180px]"
                 maxLength={500}

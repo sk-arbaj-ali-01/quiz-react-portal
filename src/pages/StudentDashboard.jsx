@@ -139,7 +139,7 @@ export default function StudentDashboard() {
 
                   {/* Attempt Action Route Redirection Link Button */}
                   <Link
-                    to={`start-quiz/${item.groupId}`}
+                    to={{pathname:`start-quiz/${item.groupId}`}}
                     className="inline-flex items-center gap-1.5 bg-[#4a5fcd] hover:bg-[#3b4da6] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <span>Attempt Quiz</span>
