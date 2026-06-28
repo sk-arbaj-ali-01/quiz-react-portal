@@ -11,6 +11,7 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import RelateTeacherToStudents from "./pages/RelateTeacherToStudents";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "./pages/Layout";
+import StudentQuizHistory from "./pages/StudentQuizHistory"
 
 function MainDashboardDirector() {
   try {
@@ -67,6 +68,18 @@ const router = createBrowserRouter([
       {
         path: "find-teachers",
         element: <RelateTeacherToStudents />
+      },
+      {
+        path: "student-submissions",
+        element: <StudentSubmissions />
+      },
+      {
+        path: "student-submission-review",
+        element: <StudentSubmissionReview />
+      },
+      {
+        path: "my-quizzes",
+        element: <StudentQuizHistory />
       }
     ]
   }

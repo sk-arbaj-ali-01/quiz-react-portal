@@ -50,7 +50,7 @@ export default function Header() {
       
       {/* Brand Cluster & Conditional Layout Links */}
       <div className="flex items-center gap-8">
-        <Link to="#dashboard" className="text-xl font-bold tracking-tight hover:opacity-90 transition-opacity">
+        <Link to="" className="text-xl font-bold tracking-tight hover:opacity-90 transition-opacity">
           QuizMaster
         </Link>
         
@@ -71,6 +71,9 @@ export default function Header() {
                 <Link to="question-management" className="text-indigo-100 hover:text-white transition-colors">
                   Manage Questions
                 </Link>
+                <Link to="student-submissions" className="text-indigo-100 hover:text-white transition-colors">
+                  Check Submissions
+                </Link>
                 <Link to="#reports" className="text-indigo-100 hover:text-white transition-colors">
                   Class Insights
                 </Link>
@@ -80,7 +83,7 @@ export default function Header() {
                  STUDENT / STANDARD DEFAULT LINKS
                  ========================================== */
               <>
-                <Link to="#dashboard" className="text-white border-b-2 border-white pb-1">
+                <Link to="" className="text-white border-b-2 border-white pb-1">
                   My Dashboard
                 </Link>
                 <Link to="#active-quizzes" className="text-indigo-100 hover:text-white transition-colors">
@@ -89,7 +92,7 @@ export default function Header() {
                 <Link to="find-teachers" className="text-indigo-100 hover:text-white transition-colors">
                   Find Teachers
                 </Link>
-                <Link to="#my-results" className="text-indigo-100 hover:text-white transition-colors">
+                <Link to="my-quizzes" className="text-indigo-100 hover:text-white transition-colors">
                   Past Grades
                 </Link>
               </>

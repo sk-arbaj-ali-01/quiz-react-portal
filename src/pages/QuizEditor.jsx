@@ -6,8 +6,6 @@ import ShortAnswer from '../components/QuizEditor/ShortAnswer';
 import { useNavigate } from 'react-router-dom';
 
 export default function QuizEditor() {
-    const USER_ID = '11111111-1111-1111-1111-111111111111';
-
     const QUESTIONS_URL = import.meta.env.VITE_QUESTIONS_URL;
     const GROUPS_URL = import.meta.env.VITE_GROUPS_URL;
 
@@ -17,6 +15,7 @@ export default function QuizEditor() {
     const [allFetchedGroupIds, setAllFetchedGroupIds] = useState([]);
     const [groupHasExistingQuestions, setGroupHasExistingQuestions] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
+    const [authData, setAuthData] = useState();
     const navigate = useNavigate();
 
     const normalizeOptions = (options = []) => {
@@ -171,7 +170,7 @@ export default function QuizEditor() {
                 method: groupHasExistingQuestions ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-user-id": USER_ID,
+                    "Authorization": `Bearer ${authData.accessToken}`,
                 },
                 body: JSON.stringify(finalQuestions)
             });
@@ -184,7 +183,7 @@ export default function QuizEditor() {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "x-user-id": USER_ID,
+                            "Authorization": `Bearer ${authData.accessToken}`,
                         },
                         body: JSON.stringify({ questionCreateRequestDto: finalQuestions })
                     });
@@ -211,6 +210,7 @@ export default function QuizEditor() {
             if(authData)
             {
                 const parsedData = JSON.parse(authData);
+                setAuthData(parsedData);
 
                 let response = await fetch(`${GROUPS_URL}?page=1&perPage=10`,{
                     headers: {
