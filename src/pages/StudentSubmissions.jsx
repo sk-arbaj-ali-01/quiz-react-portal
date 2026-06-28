@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import {Link} from 'react-router-dom';
 import useHandleFetch from '../Utilities/useHandleFetch';
 import UnAuthenticatedException from '../Exceptions/UnAuthenticatedException';
 import UnAuthorizedException from '../Exceptions/UnAuthorizedException';
@@ -126,10 +127,10 @@ export default function StudentSubmissions() {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <a href="#review" className="text-sm font-bold text-[#4a5fcd] hover:underline inline-flex items-center gap-1">
+                        <Link to={{pathname:`/student-submission-review/group/${item.groupId}/student/${item.studentId}`}} className="text-sm font-bold text-[#4a5fcd] hover:underline inline-flex items-center gap-1">
                           Review
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-                        </a>
+                        </Link>
                       </div>
                     </td>
                   </tr>
@@ -165,10 +166,10 @@ export default function StudentSubmissions() {
           <p className="mt-1 font-medium text-[11px]">&copy; 2026 QuizMaster EdTech Solution. All rights reserved.</p>
         </div>
         <div className="flex items-center gap-5 text-slate-500 font-medium">
-          <a href="#support" className="hover:underline">Support</a>
-          <a href="#privacy" className="hover:underline">Privacy Policy</a>
-          <a href="#accessibility" className="hover:underline">Accessibility</a>
-          <a href="#terms" className="hover:underline">Terms</a>
+          <Link href="#support" className="hover:underline">Support</Link>
+          <Link href="#privacy" className="hover:underline">Privacy Policy</Link>
+          <Link href="#accessibility" className="hover:underline">Accessibility</Link>
+          <Link href="#terms" className="hover:underline">Terms</Link>
         </div>
       </footer>
 

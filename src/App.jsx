@@ -74,7 +74,7 @@ const router = createBrowserRouter([
         element: <StudentSubmissions />
       },
       {
-        path: "student-submission-review",
+        path: "student-submission-review/group/:groupId/student/:studentId",
         element: <StudentSubmissionReview />
       },
       {
