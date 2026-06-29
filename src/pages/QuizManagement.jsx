@@ -31,6 +31,7 @@ function QuizManagement() {
   const handleFetch = useHandleFetch();
 
   const GROUPS_URL = import.meta.env.VITE_GROUPS_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   async function submitQuestionGroupData() {
     let group = { groupName, description, isActive, activeForDays, examDuration };
@@ -43,7 +44,7 @@ function QuizManagement() {
       }
 
       const parsedData = JSON.parse(authData);
-      await fetch(GROUPS_URL, {
+      await fetch(`${BASE_URL}/${GROUPS_URL}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -57,8 +58,8 @@ function QuizManagement() {
   }
 
   async function submitEditableQuestionGroupData(groupId) {
-    console.log(`${GROUPS_URL}/${groupId}`);
-    await fetch(`${GROUPS_URL}/${groupId}`, {
+    // console.log(`${GROUPS_URL}/${groupId}`);
+    await fetch(`${BASE_URL}/${GROUPS_URL}/${groupId}`, {
       method: 'PUT',
       headers:{
         "Content-Type": "application/json",
@@ -72,7 +73,7 @@ function QuizManagement() {
 
   async function getAllGroupData(authToken) {
 
-    let response = await fetch(`${GROUPS_URL}?page=1&perPage=10`, {
+    let response = await fetch(`${BASE_URL}/${GROUPS_URL}?page=1&perPage=10`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${authToken}`
@@ -84,7 +85,7 @@ function QuizManagement() {
   }
 
   async function DeleteQuestionGroup(groupId) {
-    await fetch(`${GROUPS_URL}/${groupId}`, {
+    await fetch(`${BASE_URL}/${GROUPS_URL}/${groupId}`, {
       method: 'DELETE',
       headers:{
         "Content-Type": "application/json",
@@ -96,7 +97,7 @@ function QuizManagement() {
   }
 
   async function fetchGroupDataByGroupId(groupId) {
-    let response = await fetch(`${GROUPS_URL}/${groupId}`,{
+    let response = await fetch(`${BASE_URL}/${GROUPS_URL}/${groupId}`,{
       headers:{
         "Content-Type": "application/json",
         "Authorization" : `Bearer ${authData.accessToken}`

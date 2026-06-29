@@ -10,6 +10,7 @@ export default function StudentSubmissions() {
   const [authData, setAuthData] = useState(null);
   const handleFetch = useHandleFetch();
   const TEACHER_URL = import.meta.env.VITE_TEACHER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
 
@@ -18,7 +19,7 @@ export default function StudentSubmissions() {
     setAuthData(parsedData);
 
     handleFetch(async () => {
-      let response = await fetch(`${TEACHER_URL}/review`, {
+      let response = await fetch(`${BASE_URL}/${TEACHER_URL}/review`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${parsedData.accessToken}`

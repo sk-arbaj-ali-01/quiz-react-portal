@@ -17,6 +17,7 @@ export default function RelateTeacherToStudents() {
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     const USERS_URL = import.meta.env.VITE_USERS_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const navigate = useNavigate();
 
@@ -68,7 +69,7 @@ export default function RelateTeacherToStudents() {
                 navigate("/login");
             }
             try {
-                const response = await fetch(`${USERS_URL}/teachers`, {
+                const response = await fetch(`${BASE_URL}/${USERS_URL}/teachers`, {
                     headers: {
                         'Content-Type': 'application/json',
                         "Authorization": `Bearer ${parsedData?.accessToken}`
@@ -122,7 +123,7 @@ export default function RelateTeacherToStudents() {
         };
 
         try {
-            const response = await fetch(`${USERS_URL}/teachers`, {
+            const response = await fetch(`${BASE_URL}/${USERS_URL}/teachers`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

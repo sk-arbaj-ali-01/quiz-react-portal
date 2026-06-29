@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 export default function QuizEditor() {
     const QUESTIONS_URL = import.meta.env.VITE_QUESTIONS_URL;
     const GROUPS_URL = import.meta.env.VITE_GROUPS_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState("");
@@ -166,7 +167,7 @@ export default function QuizEditor() {
         })
 
         try {
-            let response = await fetch(QUESTIONS_URL,{
+            let response = await fetch(`${BASE_URL}/${QUESTIONS_URL}`,{
                 method: groupHasExistingQuestions ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -212,7 +213,7 @@ export default function QuizEditor() {
                 const parsedData = JSON.parse(authData);
                 setAuthData(parsedData);
 
-                let response = await fetch(`${GROUPS_URL}?page=1&perPage=10`,{
+                let response = await fetch(`${BASE_URL}/${GROUPS_URL}?page=1&perPage=10`,{
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${parsedData.accessToken}`
@@ -239,7 +240,7 @@ export default function QuizEditor() {
             }
 
             try {
-                const response = await fetch(`${QUESTIONS_URL}/${selectedGroup}`,{
+                const response = await fetch(`${BASE_URL}/${QUESTIONS_URL}/${selectedGroup}`,{
                     headers:{
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${authData.accessToken}`

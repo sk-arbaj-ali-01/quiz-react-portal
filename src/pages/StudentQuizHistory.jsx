@@ -7,6 +7,7 @@ export default function StudentQuizHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const handleFetch = useHandleFetch();
   const STUDENT_URL = import.meta.env.VITE_STUDENTS_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchHistoryData = async () => {
@@ -18,7 +19,7 @@ export default function StudentQuizHistory() {
         const studentId = parsedAuth?.id || "CURRENT_USER";
 
         // Query historical attempt logs from backend
-        const response = await fetch(`${STUDENT_URL}/attempted-quizzes`,{
+        const response = await fetch(`${BASE_URL}/${STUDENT_URL}/attempted-quizzes`,{
             headers:{
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${parsedAuth.accessToken}`

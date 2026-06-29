@@ -6,6 +6,7 @@ export default function RegisterPage() {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   // Helper utility to programmatically invoke short-lived visual toast alerts
   const triggerToast = (message, type = 'success') => {
@@ -34,9 +35,9 @@ export default function RegisterPage() {
     };
 
     try {
-      const URL =  import.meta.env.VITE_USERS_URL || '/api/v1/users';
+      const URL =  import.meta.env.VITE_USERS_URL || 'api/v1/users';
       
-      const response = await fetch(URL, {
+      const response = await fetch(`${BASE_URL}/${URL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
