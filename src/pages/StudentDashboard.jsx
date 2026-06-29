@@ -12,6 +12,7 @@ export default function StudentDashboard() {
   const handleFetch = useHandleFetch();
 
   const STUDENTS_URL = import.meta.env.VITE_STUDENTS_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     try {
@@ -23,7 +24,7 @@ export default function StudentDashboard() {
         if (parsedData?.emailId) setStudentEmail(parsedData.emailId);
 
         handleFetch(async () => {
-          let response = await fetch(`${STUDENTS_URL}/dashboard/groups`, {
+          let response = await fetch(`${BASE_URL}/${STUDENTS_URL}/dashboard/groups`, {
             headers: {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${parsedData.accessToken}`

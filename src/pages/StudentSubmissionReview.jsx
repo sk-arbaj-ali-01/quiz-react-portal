@@ -14,6 +14,7 @@ export default function StudentSubmissionReview() {
   const navigate = useNavigate();
 
   const TEACHER_URL = import.meta.env.VITE_TEACHER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const handleSubmission = (questionId, isCorrect) =>{
     let isPresent = false;
@@ -32,7 +33,7 @@ export default function StudentSubmissionReview() {
 
   const submitReview = () =>{
     handleFetch(async ()=>{
-      const response = await fetch(`/${TEACHER_URL}/submit-review`, {
+      const response = await fetch(`${BASE_URL}/${TEACHER_URL}/submit-review`, {
         headers:{
           "Content-Type":"application/json",
           "Authorization": `Bearer ${authData.accessToken}`
@@ -57,7 +58,7 @@ export default function StudentSubmissionReview() {
     setAuthData(parsedData);
 
     handleFetch(async () => {
-      const response = fetch(`/${TEACHER_URL}/group/${groupId}/student/${studentId}`, {
+      const response = fetch(`${BASE_URL}/${TEACHER_URL}/group/${groupId}/student/${studentId}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${parsedData.accessToken}`

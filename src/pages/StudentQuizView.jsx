@@ -28,6 +28,7 @@ export default function StudentQuizView() {
 
     const QUESTION_URL = import.meta.env.VITE_QUESTIONS_URL;
     const STUDENT_URL = import.meta.env.VITE_STUDENTS_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const formatTimer = (totalSeconds) => {
         const safeSeconds = Math.max(0, totalSeconds ?? 0);
@@ -151,7 +152,7 @@ export default function StudentQuizView() {
 
     useEffect(() => {
 
-        const endpoint = `/${QUESTION_URL}/${groupIdFromRoute}`;
+        const endpoint = `${BASE_URL}/${QUESTION_URL}/${groupIdFromRoute}`;
         const authData = JSON.parse(localStorage.getItem("authData"));
         setAuthData(authData);
 
@@ -303,7 +304,7 @@ export default function StudentQuizView() {
             setIsSubmittingQuiz(true);
 
             handleFetch(async () => {
-                const response = await fetch(`/${STUDENT_URL}/submit-answers`, {
+                const response = await fetch(`${BASE_URL}/${STUDENT_URL}/submit-answers`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
