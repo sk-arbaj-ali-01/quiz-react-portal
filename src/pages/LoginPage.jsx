@@ -4,7 +4,8 @@ import useHandleFetch from '../Utilities/useHandleFetch';
 import UnAuthenticatedException from '../Exceptions/UnAuthenticatedException';
 import RecordNotFoundException from '../Exceptions/RecordNotFoundException';
 
-const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL || '/api/v1/users/login';
+const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL || 'api/v1/users/login';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function LoginPage() {
 
         await handleFetch(async () => {
             try {
-                const response = await fetch(SIGN_IN_URL, {
+                const response = await fetch(`${BASE_URL}/${SIGN_IN_URL}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

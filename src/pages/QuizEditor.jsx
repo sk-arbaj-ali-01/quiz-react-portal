@@ -239,7 +239,12 @@ export default function QuizEditor() {
             }
 
             try {
-                const response = await fetch(`${QUESTIONS_URL}/${selectedGroup}`);
+                const response = await fetch(`${QUESTIONS_URL}/${selectedGroup}`,{
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authData.accessToken}`
+                    }
+                });
 
                 if (!response.ok) {
                     setQuestions([]);
