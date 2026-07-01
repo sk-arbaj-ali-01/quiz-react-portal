@@ -48,10 +48,7 @@ export default function StudentQuizView() {
             return DEFAULT_TIMER_SECONDS;
         }
 
-        if (typeof payload.timeInSeconds === 'number') return Math.max(0, payload.timeInSeconds);
-        if (typeof payload.durationInSeconds === 'number') return Math.max(0, payload.durationInSeconds);
-        if (typeof payload.timeInMinutes === 'number') return Math.max(0, payload.timeInMinutes * 60);
-        if (typeof payload.durationInMinutes === 'number') return Math.max(0, payload.durationInMinutes * 60);
+        if (typeof payload.examDuration === 'number') return Math.max(0, payload.examDuration * 60);
 
         const timerAmount = payload.timerAmount ?? payload.timer;
 

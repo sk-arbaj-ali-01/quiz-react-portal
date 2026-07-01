@@ -9,6 +9,35 @@ export default function StudentQuizHistory() {
   const STUDENT_URL = import.meta.env.VITE_STUDENTS_URL;
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+  const fetchCertificate = async (groupId) =>{
+    const storedAuth = localStorage.getItem('authData');
+    const parsedAuth = storedAuth ? JSON.parse(storedAuth) : null;
+
+    handleFetch(async () => {
+      const response = await fetch(`${BASE_URL}/${STUDENT_URL}/report/${groupId}`,{
+        headers:{
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${parsedAuth.accessToken}`
+        }
+      });
+
+      if(!response.ok) throw new Error("Report cant be downloaded");
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "student_report.pdf";
+
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
   useEffect(() => {
     const fetchHistoryData = async () => {
       setIsLoading(true);
@@ -155,17 +184,15 @@ export default function StudentQuizHistory() {
                       {/* 5. Right Action: Certificate Download Anchor Trigger Context */}
                       <td className="px-6 py-4 text-right whitespace-nowrap">
                         {record.underReview === false ? (
-                          <a
-                            href={`/api/certificates/download/${record.certificateId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => fetchCertificate(record.groupId)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#4a5fcd] hover:text-[#3b4da6] bg-indigo-50 hover:bg-indigo-100/80 px-3.5 py-2 rounded-xl transition-all"
                           >
                             <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m0 0l-3-3m3 3l3-3m-12 1h18a2 2 0 012 2v3a2 2 0 01-2 2H3a2 2 0 01-2-2v-3a2 2 0 012-2z" />
                             </svg>
                             <span>Download Certificate</span>
-                          </a>
+                          </button>
                         ) : (
                           <button
                             disabled
