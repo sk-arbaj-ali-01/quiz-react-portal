@@ -33,7 +33,8 @@ export default function StudentSubmissionReview() {
 
   const submitReview = () =>{
     handleFetch(async ()=>{
-      const response = await fetch(`${BASE_URL}/${TEACHER_URL}/submit-review`, {
+      const response = await fetch(`${BASE_URL}/${TEACHER_URL}/submit-result`, {
+        method:"PUT",
         headers:{
           "Content-Type":"application/json",
           "Authorization": `Bearer ${authData.accessToken}`
@@ -58,7 +59,7 @@ export default function StudentSubmissionReview() {
     setAuthData(parsedData);
 
     handleFetch(async () => {
-      const response = fetch(`${BASE_URL}/${TEACHER_URL}/group/${groupId}/student/${studentId}`, {
+      const response = await fetch(`${BASE_URL}/${TEACHER_URL}/group/${groupId}/student/${studentId}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${parsedData.accessToken}`
@@ -73,6 +74,7 @@ export default function StudentSubmissionReview() {
 
       if (!response.ok) throw new Error("Some error has occurred: ", data.message);
 
+      console.log(data);
       setReviewData(data);
       
     });
@@ -116,7 +118,7 @@ export default function StudentSubmissionReview() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="bg-slate-100 text-slate-500 font-bold text-xs px-2.5 py-1 rounded-md">Question {index}</span>
+                <span className="bg-slate-100 text-slate-500 font-bold text-xs px-2.5 py-1 rounded-md">Question {index+1}</span>
                 <span className="bg-amber-50 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-md">Short Answer</span>
               </div>
               <div className="text-right text-slate-400 font-bold text-xs uppercase tracking-wider">
@@ -146,7 +148,7 @@ export default function StudentSubmissionReview() {
                 {/* Correct Evaluator Button option */}
                 <button 
                 onClick={() => handleSubmission(item.questionId, true)}
-                className="inline-flex items-center justify-center gap-2 border-2 border-emerald-600 bg-white hover:bg-emerald-50 text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
+                className="inline-flex items-center justify-center gap-2 border-2 border-emerald-600 bg-white hover:bg-emerald-50 text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-1 active:scale-95 active:translate-y-0 active:shadow-inner">
                   <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
@@ -156,7 +158,7 @@ export default function StudentSubmissionReview() {
                 {/* Incorrect Evaluator Button option */}
                 <button 
                 onClick={() => handleSubmission(item.questionId, false)}
-                className="inline-flex items-center justify-center gap-2 border-2 border-rose-500 bg-white hover:bg-rose-50 text-rose-600 font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
+                className="inline-flex items-center justify-center gap-2 border-2 border-red-600 bg-white hover:bg-emerald-50 text-red-700 font-bold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-1 active:scale-95 active:translate-y-0 active:shadow-inner">
                   <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>

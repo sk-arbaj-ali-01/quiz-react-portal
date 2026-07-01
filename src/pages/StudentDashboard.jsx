@@ -96,7 +96,7 @@ export default function StudentDashboard() {
             <div key={item.groupId} className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row max-w-4xl">
 
               {/* Left Wing Quiz Cover Image Layer */}
-              <div className="md:w-64 bg-slate-100 relative h-44 md:h-auto min-h-[160px] flex-shrink-0">
+              {/* <div className="md:w-64 bg-slate-100 relative h-44 md:h-auto min-h-[160px] flex-shrink-0">
                 <img
                   src="https://images.unsplash.com/photo-1532187863486-abf9d39d6618?auto=format&fit=crop&q=80&w=600"
                   alt="Cellular Biology Exam Artwork"
@@ -105,7 +105,7 @@ export default function StudentDashboard() {
                 <div className="absolute top-3 left-3 bg-indigo-600/95 text-white font-extrabold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md shadow-sm">
                   Biology 101
                 </div>
-              </div>
+              </div> */}
 
               {/* Right Wing Quiz Metadata & Interaction Workspace Block */}
               <div className="p-6 flex flex-col justify-between flex-grow space-y-4">
@@ -136,11 +136,21 @@ export default function StudentDashboard() {
                       </svg>
                       <span>Total Marks: <span className="text-[#4a5fcd] font-black">{item.totalPoints}</span></span>
                     </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                        </svg>
+
+                      </svg>
+                      <span>Quiz By: <span className="text-[#4a5fcd] font-black">{item.teacherName}</span></span>
+                    </div>
                   </div>
 
                   {/* Attempt Action Route Redirection Link Button */}
                   <Link
-                    to={{pathname:`start-quiz/${item.groupId}`}}
+                    to={{ pathname: `start-quiz/${item.groupId}` }}
                     className="inline-flex items-center gap-1.5 bg-[#4a5fcd] hover:bg-[#3b4da6] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <span>Attempt Quiz</span>
