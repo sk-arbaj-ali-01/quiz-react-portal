@@ -322,7 +322,7 @@ export default function StudentQuizView() {
                         </div>,
                         { duration: 3000 }
                     );
-                    navigate('');
+                    navigate('/');
                 }
 
                 if (!response.ok) {
